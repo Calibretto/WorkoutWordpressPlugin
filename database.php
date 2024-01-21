@@ -21,7 +21,7 @@ if ( class_exists( 'BHWorkoutPlugin_DatabaseManager' ) == FALSE ) {
             // Equipment table
             $equipment_table_name = self::prefix() . "equipment";
             
-            $sql = "CREATE TABLE IF NOT EXISTS $table_name (
+            $sql = "CREATE TABLE IF NOT EXISTS $equipment_table_name (
                 ID varchar(36) NOT NULL,
                 Name varchar(512) NOT NULL,
                 Value decimal(10,3) NOT NULL,
@@ -37,7 +37,7 @@ if ( class_exists( 'BHWorkoutPlugin_DatabaseManager' ) == FALSE ) {
 
             // Equipment stored procedures
             $equipment_table_name = self::prefix() . "equipment";
-            
+
             $sql = "DROP PROCEDURE add_equipment;";
             $wpdb->query($sql);
             
