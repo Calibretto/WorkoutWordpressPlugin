@@ -19,6 +19,10 @@ if ( class_exists( 'BHWorkoutPlugin_Equipment' ) == FALSE ) {
             return "SELECT * FROM $table_name ORDER BY Name ASC;";
         }
 
+        public static function delete_query($table_name) : string {
+            return "DELETE FROM $table_name WHERE ID='%s'";
+        }
+
         public static function from_db_query($query_result) : BHWorkoutPlugin_Equipment {
             $equipment = new BHWorkoutPlugin_Equipment;
             $equipment->id = $query_result->ID;

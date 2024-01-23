@@ -4,14 +4,11 @@ require_once plugin_dir_path( __FILE__ ) . "../database.php";
 
 <div class="wrap">
     <h1><?php echo esc_html( get_admin_page_title() ); ?></h1>
-    <div class="notice notice-error equipment-general-error" id='equipment-general-error'>
+    <div class="notice notice-error equipment-general-error is-dismissible" id='equipment-general-error'>
         <p>Something weird went wrong - please try reloading the page.</p>
     </div>
-    <div class="notice notice-error equipment-name-error" id='equipment-name-error'>
+    <div class="notice notice-error equipment-name-error is-dismissible" id='equipment-name-error'>
         <p>You must include a name for the equipment</p>
-    </div>
-    <div class="notice notice-success equipment-added-success" id='equipment-added-success'>
-        <p>Equipment successfully added</p>
     </div>
     <h2>Add Equipment</h2>
     <form action="<?php menu_page_url('pages/equipment.php') ?>" method="post" name='add-equipment' id='add-equipment'>
@@ -46,6 +43,9 @@ require_once plugin_dir_path( __FILE__ ) . "../database.php";
         </table>
     </form>
     <h2>Equipment List</h2>
+    <form action="<?php menu_page_url('pages/equipment.php') ?>" method="post" name='delete-equipment' id='delete-equipment'>
+        <input type="hidden" name='equipment_delete' id='equipment_delete' value="equipment_delete"/>
+    </form>
     <?php
         $equipment = BHWorkoutPlugin_DatabaseManager::get_all_equipment();
         if(count($equipment) == 0) {
@@ -55,8 +55,9 @@ require_once plugin_dir_path( __FILE__ ) . "../database.php";
             <table class='equipment'>
                 <tr class='equipment-header'>
                     <th class='equipment-header-name'>Name</th>
-                    <th class='equipment-header-min'>Value</th>
+                    <th class='equipment-header-value'>Value</th>
                     <th class='equipment-header-step'>Step</th>
+                    <th class='equipment-header-actions'>Actions</th>
                 </tr>
             <?php
             $count = 0;
@@ -69,7 +70,10 @@ require_once plugin_dir_path( __FILE__ ) . "../database.php";
                 echo  "<tr class='$class equipment-list'>";
                     echo "<td class='equipment-name'>$e->name</td>";
                     echo "<td class='equipment-value'>".$e->display_value()."</td>";
-                    echo "<td class='equipment-value-step'>".$e->display_value_step()."</td>";
+                    echo "<td class='equipment-step'>".$e->display_value_step()."</td>";
+                    echo "<td class='equipment-actions'>";
+                        echo "<input type='button' value='delete' onclick='deleteEquipment(\"$e->id\");'/>";
+                    echo "</td>";
                 echo  "</tr>";
 
                 $count++;

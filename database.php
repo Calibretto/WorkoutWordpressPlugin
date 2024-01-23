@@ -69,6 +69,22 @@ if ( class_exists( 'BHWorkoutPlugin_DatabaseManager' ) == FALSE ) {
             }
         }
 
+        public static function delete_equipment(?string $equipment_id) {
+            global $wpdb;
+            $equipment_table_name = self::equipment_table();
+
+            if (is_null($equipment_id)) {
+                throw new Exception("Nothing to delete.");
+            }
+
+            $delete_query = BHWorkoutPlugin_Equipment::delete_query($equipment_table_name);
+            
+            $result = $wpdb->query($wpdb->prepare($delete_query, array($equipment_id)));
+            if (($result === FALSE) || ($result == 0)) {
+                throw new Exception("Unable to delete equipment.");
+            }
+        }
+
         public static function get_all_equipment() : ?array {
             global $wpdb;
             $equipment_table_name = self::equipment_table();

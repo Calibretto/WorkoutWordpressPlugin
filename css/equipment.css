@@ -6,6 +6,54 @@ div.equipment-general-error {
     display: none;
 }
 
-div.equipment-added-success {
-    display: none;
+table.equipment {
+
+}
+
+tr.equipment-header {
+    
+}
+
+tr.equipment-list {
+    
+}
+
+th.equipment-header-name {
+    
+}
+
+th.equipment-header-value {
+    
+}
+
+th.equipment-header-step {
+    
+}
+
+th.equipment-header-actions {
+    
+}
+
+td.equipment-name {
+    
+}
+
+td.equipment-value {
+    
+}
+
+td.equipment-step {
+    
+}
+
+td.equipment-actions {
+    
+}
+
+td.equipment-odd {
+    
+}
+
+td.equipment-even {
+    
 }
