@@ -1,12 +1,17 @@
 <?php
 require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+require_once __DIR__ . "/equipment.php";
 
 if ( class_exists( 'BHWorkoutPlugin_DatabaseManager' ) == FALSE ) {
     class BHWorkoutPlugin_DatabaseManager {
 
-        private static function prefix() {
+        private static function prefix() : string {
             global $wpdb;
             return $wpdb->prefix . "bhworkout_";
+        }
+
+        private static function equipment_table() : string {
+            return self::prefix() . "equipment";
         }
 
         public static function activation_setup() {
@@ -19,14 +24,15 @@ if ( class_exists( 'BHWorkoutPlugin_DatabaseManager' ) == FALSE ) {
             $charset_collate = $wpdb->get_charset_collate();
 
             // Equipment table
-            $equipment_table_name = self::prefix() . "equipment";
+            $equipment_table_name = self::equipment_table();
             
             $sql = "CREATE TABLE IF NOT EXISTS $equipment_table_name (
                 ID varchar(36) NOT NULL,
                 Name varchar(512) NOT NULL,
-                Value decimal(10,3) NOT NULL,
+                ValueMin decimal(10,2) DEFAULT NULL,
+                ValueMax decimal(10,2) DEFAULT NULL,
+                ValueStep decimal(10,2) DEFAULT NULL,
                 Units enum('kg') DEFAULT NULL,
-                Multiplier decimal(10,2) NOT NULL DEFAULT 1.00,
                 PRIMARY KEY  (ID)
               ) $charset_collate;";
             dbDelta($sql);
@@ -34,25 +40,40 @@ if ( class_exists( 'BHWorkoutPlugin_DatabaseManager' ) == FALSE ) {
 
         private static function create_stored_procedures() {
             global $wpdb;
+            $equipment_table_name = self::equipment_table();
 
             // Equipment stored procedures
-            $equipment_table_name = self::prefix() . "equipment";
-
             $sql = "DROP PROCEDURE add_equipment;";
             $wpdb->query($sql);
             
             $sql = "CREATE DEFINER=`root`@`localhost` PROCEDURE `add_equipment`(
                 IN `_name` VARCHAR(512) CHARSET utf8, 
-                IN `_value` DECIMAL(10,3) UNSIGNED, 
-                IN `_units` ENUM('kg') CHARSET utf8, 
-                IN `_multiplier` DECIMAL(10,2) UNSIGNED, 
-                OUT `_id` VARCHAR(36) CHARSET utf8
+                IN `_value_min` DECIMAL(10,2) UNSIGNED, 
+                IN `_value_max` DECIMAL(10,2) UNSIGNED, 
+                IN `_value_step` DECIMAL(10,2) UNSIGNED, 
+                IN `_units` ENUM('kg') CHARSET utf8
                 ) NOT DETERMINISTIC MODIFIES SQL DATA SQL SECURITY DEFINER 
                 BEGIN 
-                    SET _id = UUID(); 
-                    INSERT INTO $equipment_table_name(ID, Name, Units, Value, Multiplier) values (_id, _name, _value, _units, _multiplier); 
+                    INSERT INTO $equipment_table_name(ID, Name, ValueMin, ValueMax, ValueStep, Units) values (UUID(), _name, _value_min, _value_max, _value_step, _units); 
                 END";
             $wpdb->query($sql);
+        }
+
+        public static function add_equipment(BHWorkoutPlugin_Equipment $equipment) {
+            global $wpdb;
+
+            $result = $wpdb->query($equipment->db_insert());
+
+            if ($result === FALSE) {
+                throw new Exception("Unable to insert equipment.");
+            }
+        }
+
+        public static function get_all_equipment() : ?array {
+            global $wpdb;
+            $equipment_table_name = self::equipment_table();
+
+            $results = $wpdb->get_results("SELECT * FROM $equipment_table_name");
         }
     }
 }

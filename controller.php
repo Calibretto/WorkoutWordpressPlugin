@@ -7,7 +7,7 @@ if ( class_exists( 'BHWorkoutPlugin_Controller' ) == FALSE ) {
         public static function activation_setup() {
             BHWorkoutPlugin_DatabaseManager::activation_setup();
         }
-
+        
     }
 }
 ?>

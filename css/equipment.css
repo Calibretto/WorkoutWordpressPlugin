@@ -1,0 +1,11 @@
+div.equipment-name-error {
+    display: none;
+}
+
+div.equipment-general-error {
+    display: none;
+}
+
+div.equipment-added-success {
+    display: none;
+}

@@ -31,4 +31,10 @@ if (is_admin()) {
 	add_action( 'init', array( 'BHWorkoutPlugin_Admin', 'init' ) );
 }
 
+// De-activation
+// TBD
+
+// Uninstall
+// TBD
+
 ?>
