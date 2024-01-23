@@ -73,7 +73,14 @@ if ( class_exists( 'BHWorkoutPlugin_DatabaseManager' ) == FALSE ) {
             global $wpdb;
             $equipment_table_name = self::equipment_table();
 
-            $results = $wpdb->get_results("SELECT * FROM $equipment_table_name");
+            $equipment = array();
+
+            $results = $wpdb->get_results(BHWorkoutPlugin_Equipment::get_all_query($equipment_table_name));
+            foreach ($results as $result) {
+                $equipment[] = BHWorkoutPlugin_Equipment::from_db_query($result);
+            }
+            
+            return $equipment;
         }
     }
 }

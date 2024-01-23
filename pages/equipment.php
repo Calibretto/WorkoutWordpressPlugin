@@ -1,3 +1,7 @@
+<?php
+require_once plugin_dir_path( __FILE__ ) . "../database.php";
+?>
+
 <div class="wrap">
     <h1><?php echo esc_html( get_admin_page_title() ); ?></h1>
     <div class="notice notice-error equipment-general-error" id='equipment-general-error'>
@@ -40,4 +44,36 @@
             </tr>
         </table>
     </form>
+    <h2>Equipment List</h2>
+    <?php
+        $equipment = BHWorkoutPlugin_DatabaseManager::get_all_equipment();
+        if(count($equipment) == 0) {
+            echo "<p>No equipment available.</p>";
+        } else {
+            ?> 
+            <table class='equipment'>
+                <tr class='equipment-header'>
+                    <th class='equipment-header-name'>Name</th>
+                    <th class='equipment-header-min'>Value</th>
+                    <th class='equipment-header-step'>Step</th>
+                </tr>
+            <?php
+            $count = 0;
+            foreach($equipment as $e) {
+                $class = "equipment-odd";
+                if (($count % 2) == 0) {
+                    $class = "equipment-even";
+                }
+
+                echo  "<tr class='$class equipment-list'>";
+                    echo "<td class='equipment-name'>$e->name</td>";
+                    echo "<td class='equipment-value'>".$e->display_value()."</td>";
+                    echo "<td class='equipment-value-step'>".$e->display_value_step()."</td>";
+                echo  "</tr>";
+
+                $count++;
+            }
+            ?> </table> <?php
+        }
+    ?>
 </div>
