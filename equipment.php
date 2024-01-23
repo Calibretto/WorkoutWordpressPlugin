@@ -2,6 +2,7 @@
 require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
 
 enum EquipmentUnit: String {
+    case NONE = "none";
     case KG = 'kg';
 }
 
@@ -66,12 +67,22 @@ if ( class_exists( 'BHWorkoutPlugin_Equipment' ) == FALSE ) {
             return $sql;
         }
 
+        public function display_unit() : string {
+            $unit_value = $this->units->value;
+            if ($unit_value == "none") {
+                $unit_value = "";
+            }
+
+            return $unit_value;
+        }
+
         public function display_value() : string {
             if ($this->has_value()) {
+                $unit_value = $this->display_unit();
                 if ($this->value_min == $this->value_max) {
-                    return $this->value_min . $this->units->value;
+                    return $this->value_min . $unit_value;
                 } else {
-                    return $this->value_min . $this->units->value." - ".$this->value_max . $this->units->value;
+                    return $this->value_min . $unit_value." - ".$this->value_max . $unit_value;
                 }
             }
 

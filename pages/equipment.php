@@ -28,12 +28,13 @@ require_once plugin_dir_path( __FILE__ ) . "../database.php";
                     <input type='number' min='0' max='100' step='0.25' name='equipment_value_max' id='equipment_value_max'/>
                      
                     <select name='equipment_units' id='equipment_units'>
+                        <option value="empty">-</option>
                         <option value="none">None</option>
                         <option value="kg">Kilograms</option>
                     </select>
 
                     Step: 
-                    <input type='number' min='0' max='100' step='0.25' value='0.25' name='equipment_value_step' id='equipment_value_step'/>
+                    <input type='number' min='0' max='100' step='0.25' name='equipment_value_step' id='equipment_value_step'/>
                 </td>
             </tr>
             <tr>
