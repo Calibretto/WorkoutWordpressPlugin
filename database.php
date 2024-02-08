@@ -32,7 +32,7 @@ if ( class_exists( 'BHWorkoutPlugin_DatabaseManager' ) == FALSE ) {
                 ValueMin decimal(10,2) DEFAULT NULL,
                 ValueMax decimal(10,2) DEFAULT NULL,
                 ValueStep decimal(10,2) DEFAULT NULL,
-                Units enum('kg') DEFAULT NULL,
+                Units enum('none', 'kg') DEFAULT NULL,
                 PRIMARY KEY  (ID)
               ) $charset_collate;";
             dbDelta($sql);
@@ -51,7 +51,7 @@ if ( class_exists( 'BHWorkoutPlugin_DatabaseManager' ) == FALSE ) {
                 IN `_value_min` DECIMAL(10,2) UNSIGNED, 
                 IN `_value_max` DECIMAL(10,2) UNSIGNED, 
                 IN `_value_step` DECIMAL(10,2) UNSIGNED, 
-                IN `_units` ENUM('kg') CHARSET utf8
+                IN `_units` ENUM('none', 'kg') CHARSET utf8
                 ) NOT DETERMINISTIC MODIFIES SQL DATA SQL SECURITY DEFINER 
                 BEGIN 
                     INSERT INTO $equipment_table_name(ID, Name, ValueMin, ValueMax, ValueStep, Units) values (UUID(), _name, _value_min, _value_max, _value_step, _units); 
@@ -66,6 +66,17 @@ if ( class_exists( 'BHWorkoutPlugin_DatabaseManager' ) == FALSE ) {
 
             if ($result === FALSE) {
                 throw new Exception("Unable to insert equipment.");
+            }
+        }
+
+        public static function update_equipment(BHWorkoutPlugin_Equipment $equipment) {
+            global $wpdb;
+            $equipment_table_name = self::equipment_table();
+
+            $result = $wpdb->query($equipment->db_update($equipment_table_name));
+
+            if ($result === FALSE) {
+                throw new Exception("Unable to update equipment.");
             }
         }
 
@@ -85,17 +96,37 @@ if ( class_exists( 'BHWorkoutPlugin_DatabaseManager' ) == FALSE ) {
             }
         }
 
+        public static function get_equipment(?string $equipment_id) : ?BHWorkoutPlugin_Equipment {
+            global $wpdb;
+            $equipment_table_name = self::equipment_table();
+
+            if (is_null($equipment_id)) {
+                throw new Exception("Nothing to get.");
+            }
+
+            $select_query = BHWorkoutPlugin_Equipment::select_query($equipment_table_name);
+            
+            $result = $wpdb->get_results($wpdb->prepare($select_query, array($equipment_id)));
+            if (($result === FALSE) || ($result == 0) || (count($result) == 0)) {
+                throw new Exception("Unable to retrieve equipment.");
+            }
+
+            return BHWorkoutPlugin_Equipment::from_db_query($result[0]);
+        }
+
         public static function get_all_equipment() : ?array {
             global $wpdb;
             $equipment_table_name = self::equipment_table();
 
-            $equipment = array();
-
             $results = $wpdb->get_results(BHWorkoutPlugin_Equipment::get_all_query($equipment_table_name));
+            if (($results === FALSE) || ($results == 0) || (count($results) == 0)) {
+                throw new Exception("Unable to retrieve equipment.");
+            }
+
+            $equipment = array();
             foreach ($results as $result) {
                 $equipment[] = BHWorkoutPlugin_Equipment::from_db_query($result);
             }
-            
             return $equipment;
         }
     }

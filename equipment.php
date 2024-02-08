@@ -15,11 +15,15 @@ if ( class_exists( 'BHWorkoutPlugin_Equipment' ) == FALSE ) {
         public ?string $value_step = NULL;
         public ?EquipmentUnit $units = NULL;
 
-        public static function get_all_query($table_name) : string {
+        public static function get_all_query(string $table_name) : string {
             return "SELECT * FROM $table_name ORDER BY Name ASC;";
         }
 
-        public static function delete_query($table_name) : string {
+        public static function select_query(string $table_name) : string {
+            return "SELECT * FROM $table_name WHERE ID='%s';";
+        }
+
+        public static function delete_query(string $table_name) : string {
             return "DELETE FROM $table_name WHERE ID='%s'";
         }
 
@@ -35,38 +39,56 @@ if ( class_exists( 'BHWorkoutPlugin_Equipment' ) == FALSE ) {
             return $equipment;
         }
 
-        public function db_insert() : string {
+        private function to_array() : array {
             global $wpdb;
 
-            $name = $this->name;
-            if(strlen($name) <= 0) {
+            $obj = [];
+
+            if(is_null($this->id) == FALSE) {
+                $obj['id'] = $this->id;
+            }
+
+            $obj['name'] = $this->name;
+            if(strlen($obj['name']) <= 0) {
                 throw new Exception("Name length must be greater than zero.");
             }
-            $name = $wpdb->_real_escape($name);
+            $obj['name'] = $wpdb->_real_escape($obj['name']);
 
-            $value_max = $this->value_max;
-            $value_min = $this->value_min;
-            $value_step = $this->value_step;
-
-            $units = $this->units;
-            if (is_null($units) == FALSE) {
-                $units = $units->value;
+            if ($this->has_value()) {
+                $obj['value_max'] = $this->value_max;
+                $obj['value_min'] = $this->value_min;
+                $obj['value_step'] = $this->value_step;
+                $obj['units'] = $this->units->value;
             }
 
-            if ($this->has_value() == FALSE) {
-                $value_min = NULL;
-                $value_max = NULL;
-                $value_step = NULL;
-                $units = NULL;
-            }
+            return $obj;
+        }
+
+        public function db_insert() : string {
+            $obj = $this->to_array();
 
             $sql = "CALL add_equipment(";
-            $sql .= "'$name',";
-            $sql .= is_null($value_min) ? "NULL," : "$value_min,";
-            $sql .= is_null($value_max) ? "NULL," : "$value_max,";
-            $sql .= is_null($value_step) ? "NULL," : "$value_step,";
-            $sql .= is_null($units) ? "NULL" : "'$units'";
+            $sql .= "'".$obj['name']."',";
+            $sql .= isset($obj['value_min']) ? $obj['value_min']."," : "NULL,";
+            $sql .= isset($obj['value_max']) ? $obj['value_max']."," : "NULL,";
+            $sql .= isset($obj['value_step']) ? $obj['value_step']."," : "NULL,";
+            $sql .= isset($obj['units']) ? "'".$obj['units']."'" : "NULL";
             $sql .= ");";
+
+            error_log($sql);
+            return $sql;
+        }
+
+        public function db_update(string $table_name) : string {
+            $obj = $this->to_array();
+
+            $sql = "UPDATE $table_name SET ";
+            $sql .= "Name='".$obj['name']."', ";
+            $sql .= "ValueMin=".(isset($obj['value_min']) ? $obj['value_min'].", " : "NULL, ");
+            $sql .= "ValueMax=".(isset($obj['value_max']) ? $obj['value_max'].", " : "NULL, ");
+            $sql .= "ValueStep=".(isset($obj['value_step']) ? $obj['value_step'].", " : "NULL, ");
+            $sql .= "Units=".(isset($obj['units']) ? "'".$obj['units']."'" : "NULL");
+            $sql .= " WHERE ID='".$obj['id']."'";
 
             return $sql;
         }
@@ -95,7 +117,7 @@ if ( class_exists( 'BHWorkoutPlugin_Equipment' ) == FALSE ) {
 
         public function display_value_step() : string {
             if ($this->has_value() && ($this->value_step != "0.00")) {
-                return "$this->value_step ".$this->units->value;
+                return "$this->value_step ".$this->display_unit();
             }
 
             return "-";

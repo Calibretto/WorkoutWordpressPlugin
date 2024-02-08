@@ -45,7 +45,11 @@ if ( class_exists( 'BHWorkoutPlugin_Admin' ) == FALSE ) {
         }
 
         static function workouts_admin_equipment_page_load(){
-            require_once plugin_dir_path( __FILE__ ) . 'pages/equipment.php';
+            if (isset($_POST['equipment_edit'])) {
+                require_once plugin_dir_path( __FILE__ ) . "pages/equipment-edit.php";
+            } else {
+                require_once plugin_dir_path( __FILE__ ) . 'pages/equipment.php';
+            }
         }
 
         static function workouts_admin_equipment_page_submit() {
@@ -53,16 +57,24 @@ if ( class_exists( 'BHWorkoutPlugin_Admin' ) == FALSE ) {
                 BHWorkoutPlugin_Admin::workouts_admin_add_equipment();
             } elseif (isset($_POST['equipment_delete'])) {
                 BHWorkoutPlugin_Admin::workouts_admin_delete_equipment();
+            } elseif (isset($_POST['equipment_save'])) {
+                BHWorkoutPlugin_Admin::workouts_admin_update_equipment();
             }
         }
 
-        private static function workouts_admin_add_equipment() {
+        private static function workouts_admin_parse_equipment() : BHWorkoutPlugin_Equipment {
             $equipment = new BHWorkoutPlugin_Equipment;
+            $equipment->id = isset($_POST['equipment_id']) ? $_POST['equipment_id'] : NULL;
             $equipment->name = $_POST['equipment_name'];
             $equipment->value_min = number_format((float)$_POST['equipment_value_min'], 2, '.', '');
             $equipment->value_max = number_format((float)$_POST['equipment_value_max'], 2, '.', '');
             $equipment->value_step = number_format((float)$_POST['equipment_value_step'], 2, '.', '');
             $equipment->units = EquipmentUnit::tryFrom($_POST['equipment_units']);
+            return $equipment;
+        }
+
+        private static function workouts_admin_add_equipment() {
+            $equipment = BHWorkoutPlugin_Admin::workouts_admin_parse_equipment();
 
             try {
                 BHWorkoutPlugin_DatabaseManager::add_equipment($equipment);
@@ -83,7 +95,22 @@ if ( class_exists( 'BHWorkoutPlugin_Admin' ) == FALSE ) {
             }
         }
 
+        private static function workouts_admin_update_equipment() {
+            $equipment = BHWorkoutPlugin_Admin::workouts_admin_parse_equipment();
+
+            try {
+                BHWorkoutPlugin_DatabaseManager::update_equipment($equipment);
+                BHWorkoutPlugin_Notice::success("Updated equipment");
+            } catch (Exception $e) {
+                BHWorkoutPlugin_Notice::error($e->getMessage());
+                error_log($e);
+            }
+        }
+
         public static function load_resources($hook) {
+            wp_register_script('common.js', plugin_dir_url( __FILE__ ) . 'js/common.js');
+            wp_enqueue_script('common.js');
+
             if ($hook == 'workouts_page_pages/equipment') {
                 wp_register_style('equipment.css', plugin_dir_url( __FILE__ ) . 'css/equipment.css');
                 wp_enqueue_style('equipment.css');

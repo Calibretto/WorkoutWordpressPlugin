@@ -1,5 +1,6 @@
 <?php
 require_once plugin_dir_path( __FILE__ ) . "../database.php";
+require_once plugin_dir_path( __FILE__ ) . "../common.php";
 ?>
 
 <div class="wrap">
@@ -24,11 +25,12 @@ require_once plugin_dir_path( __FILE__ ) . "../database.php";
                      - 
                     <input type='number' min='0' max='100' step='0.25' name='equipment_value_max' id='equipment_value_max'/>
                      
-                    <select name='equipment_units' id='equipment_units'>
-                        <option value="empty">-</option>
-                        <option value="none">None</option>
-                        <option value="kg">Kilograms</option>
-                    </select>
+                    <?php 
+                        echo BHWorkoutPlugin_Common::htmlSelect(EquipmentUnit::cases(), 
+                                                                'equipment_units', 
+                                                                NULL, 
+                                                                FALSE);
+                    ?>
 
                     Step: 
                     <input type='number' min='0' max='100' step='0.25' name='equipment_value_step' id='equipment_value_step'/>
@@ -45,6 +47,9 @@ require_once plugin_dir_path( __FILE__ ) . "../database.php";
     <h2>Equipment List</h2>
     <form action="<?php menu_page_url('pages/equipment.php') ?>" method="post" name='delete-equipment' id='delete-equipment'>
         <input type="hidden" name='equipment_delete' id='equipment_delete' value="equipment_delete"/>
+    </form>
+    <form action="<?php admin_url('pages/equipment.php') ?>" method="post" name='edit-equipment' id='edit-equipment'>
+        <input type="hidden" name='equipment_edit' id='equipment_edit' value="equipment_edit"/>
     </form>
     <?php
         $equipment = BHWorkoutPlugin_DatabaseManager::get_all_equipment();
@@ -72,6 +77,7 @@ require_once plugin_dir_path( __FILE__ ) . "../database.php";
                     echo "<td class='equipment-value'>".$e->display_value()."</td>";
                     echo "<td class='equipment-step'>".$e->display_value_step()."</td>";
                     echo "<td class='equipment-actions'>";
+                        echo "<input type='button' value='edit' onclick='editEquipment(\"$e->id\");'/>";
                         echo "<input type='button' value='delete' onclick='deleteEquipment(\"$e->id\");'/>";
                     echo "</td>";
                 echo  "</tr>";
