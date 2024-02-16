@@ -1,6 +1,7 @@
 <?php
 require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
-require_once __DIR__ . "/equipment.php";
+require_once plugin_dir_path( __FILE__ ) . "/equipment.php";
+require_once plugin_dir_path( __FILE__ ) . "/warmup.php";
 
 if ( class_exists( 'BHWorkoutPlugin_DatabaseManager' ) == FALSE ) {
     class BHWorkoutPlugin_DatabaseManager {
@@ -17,10 +18,12 @@ if ( class_exists( 'BHWorkoutPlugin_DatabaseManager' ) == FALSE ) {
 
         private static function create_tables() {
             BHWorkoutPlugin_EquipmentDB::create_tables();
+            BHWorkoutPlugin_WarmupsDB::create_tables();
         }
 
         private static function create_stored_procedures() {
             BHWorkoutPlugin_EquipmentDB::create_stored_procedures();
+            BHWorkoutPlugin_WarmupsDB::create_stored_procedures();
         }
     }
 }

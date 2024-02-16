@@ -30,6 +30,7 @@ if ( class_exists( 'BHWorkoutPlugin_Admin' ) == FALSE ) {
 
             add_menu_page( $page_title, $menu_title, $capability, $menu_slug, $function );
 
+            // Equipment
             $root_menu = 'pages/admin.php';
             $page_title = 'Equipment';
             $menu_title = 'Equipment';
@@ -39,12 +40,24 @@ if ( class_exists( 'BHWorkoutPlugin_Admin' ) == FALSE ) {
 
             $hookname = add_submenu_page($root_menu, $page_title, $menu_title, $capability, $menu_slug, $function);
             add_action( 'load-' . $hookname, array('BHWorkoutPlugin_Admin', 'workouts_admin_equipment_page_submit'));
+
+            // Warmups
+            $root_menu = 'pages/admin.php';
+            $page_title = 'Warmups';
+            $menu_title = 'Warmups';
+            $capability = 'manage_options';
+            $menu_slug  = 'pages/warmups.php';
+            $function   = array('BHWorkoutPlugin_Admin', 'workouts_admin_warmups_page_load');
+
+            $hookname = add_submenu_page($root_menu, $page_title, $menu_title, $capability, $menu_slug, $function);
+            add_action( 'load-' . $hookname, array('BHWorkoutPlugin_Admin', 'workouts_admin_warmups_page_submit'));
         }
 
         static function workouts_admin_page_load(){
             require_once plugin_dir_path( __FILE__ ) . 'pages/admin.php';
         }
 
+        // Equipment
         static function workouts_admin_equipment_page_load(){
             if (isset($_POST['equipment_edit'])) {
                 require_once plugin_dir_path( __FILE__ ) . "pages/equipment-edit.php";
@@ -108,6 +121,38 @@ if ( class_exists( 'BHWorkoutPlugin_Admin' ) == FALSE ) {
             }
         }
 
+        // Warmups
+        static function workouts_admin_warmups_page_load(){
+            if (isset($_POST['warmup_edit'])) {
+                require_once plugin_dir_path( __FILE__ ) . "pages/warmup-edit.php";
+            } else {
+                require_once plugin_dir_path( __FILE__ ) . 'pages/warmups.php';
+            }
+        }
+
+        static function workouts_admin_warmups_page_submit() {
+            if (isset($_POST['warmup_submit'])) {
+                BHWorkoutPlugin_Admin::workouts_admin_add_warmup();
+            } elseif (isset($_POST['warmup_delete'])) {
+                BHWorkoutPlugin_Admin::workouts_admin_delete_warmup();
+            } elseif (isset($_POST['warmup_save'])) {
+                BHWorkoutPlugin_Admin::workouts_admin_update_warmup();
+            }
+        }
+
+        private static function workouts_admin_add_warmup() {
+            // TBD
+        }
+
+        private static function workouts_admin_delete_warmup() {
+            // TBD
+        }
+
+        private static function workouts_admin_update_warmup() {
+            // TBD
+        }
+
+        // General
         public static function load_resources($hook) {
             wp_register_script('common.js', plugin_dir_url( __FILE__ ) . 'js/common.js');
             wp_enqueue_script('common.js');
@@ -118,6 +163,14 @@ if ( class_exists( 'BHWorkoutPlugin_Admin' ) == FALSE ) {
 
                 wp_register_script('equipment.js', plugin_dir_url( __FILE__ ) . 'js/equipment.js');
                 wp_enqueue_script('equipment.js');
+            }
+
+            if ($hook == 'workouts_page_pages/warmups') {
+                wp_register_style('warmups.css', plugin_dir_url( __FILE__ ) . 'css/warmups.css');
+                wp_enqueue_style('warmups.css');
+
+                wp_register_script('warmups.js', plugin_dir_url( __FILE__ ) . 'js/warmups.js');
+                wp_enqueue_script('warmups.js');
             }
         }
     }
