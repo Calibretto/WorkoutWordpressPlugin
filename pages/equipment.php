@@ -1,5 +1,5 @@
 <?php
-require_once plugin_dir_path( __FILE__ ) . "../database.php";
+require_once plugin_dir_path( __FILE__ ) . "../admin/db/equipment.php";
 require_once plugin_dir_path( __FILE__ ) . "../common.php";
 ?>
 
@@ -52,7 +52,7 @@ require_once plugin_dir_path( __FILE__ ) . "../common.php";
         <input type="hidden" name='equipment_edit' id='equipment_edit' value="equipment_edit"/>
     </form>
     <?php
-        $equipment = BHWorkoutPlugin_DatabaseManager::get_all_equipment();
+        $equipment = BHWorkoutPlugin_EquipmentDB::get_all_equipment();
         if(count($equipment) == 0) {
             echo "<p>No equipment available.</p>";
         } else {

@@ -1,11 +1,11 @@
 <?php
-require_once plugin_dir_path( __FILE__ ) . "../database.php";
+require_once plugin_dir_path( __FILE__ ) . "../admin/db/equipment.php";
 require_once plugin_dir_path( __FILE__ ) . "../equipment.php";
 require_once plugin_dir_path( __FILE__ ) . "../common.php";
 
 $equipment = NULL;
 try {
-    $equipment = BHWorkoutPlugin_DatabaseManager::get_equipment($_POST['equipment_edit']);
+    $equipment = BHWorkoutPlugin_EquipmentDB::get_equipment($_POST['equipment_edit']);
 } catch (Exception $e) {
     BHWorkoutPlugin_Notice::error($e->getMessage());
     error_log($e);

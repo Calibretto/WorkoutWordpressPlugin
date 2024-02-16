@@ -1,6 +1,7 @@
 <?php
-require_once __DIR__ . "/database.php";
-require_once __DIR__ . "/utils/notices.php";
+require_once plugin_dir_path( __FILE__ ) . "/database.php";
+require_once plugin_dir_path( __FILE__ ) . "/admin/db/equipment.php";
+require_once plugin_dir_path( __FILE__ ) . "/utils/notices.php";
 
 if ( class_exists( 'BHWorkoutPlugin_Admin' ) == FALSE ) {
     class BHWorkoutPlugin_Admin {
@@ -77,7 +78,7 @@ if ( class_exists( 'BHWorkoutPlugin_Admin' ) == FALSE ) {
             $equipment = BHWorkoutPlugin_Admin::workouts_admin_parse_equipment();
 
             try {
-                BHWorkoutPlugin_DatabaseManager::add_equipment($equipment);
+                BHWorkoutPlugin_EquipmentDB::add_equipment($equipment);
                 BHWorkoutPlugin_Notice::success("Added equipment");
             } catch (Exception $e) {
                 BHWorkoutPlugin_Notice::error($e->getMessage());
@@ -87,7 +88,7 @@ if ( class_exists( 'BHWorkoutPlugin_Admin' ) == FALSE ) {
 
         private static function workouts_admin_delete_equipment() {
             try {
-                BHWorkoutPlugin_DatabaseManager::delete_equipment($_POST['equipment_delete']);
+                BHWorkoutPlugin_EquipmentDB::delete_equipment($_POST['equipment_delete']);
                 BHWorkoutPlugin_Notice::success("Deleted equipment");
             } catch (Exception $e) {
                 BHWorkoutPlugin_Notice::error($e->getMessage());
@@ -99,7 +100,7 @@ if ( class_exists( 'BHWorkoutPlugin_Admin' ) == FALSE ) {
             $equipment = BHWorkoutPlugin_Admin::workouts_admin_parse_equipment();
 
             try {
-                BHWorkoutPlugin_DatabaseManager::update_equipment($equipment);
+                BHWorkoutPlugin_EquipmentDB::update_equipment($equipment);
                 BHWorkoutPlugin_Notice::success("Updated equipment");
             } catch (Exception $e) {
                 BHWorkoutPlugin_Notice::error($e->getMessage());

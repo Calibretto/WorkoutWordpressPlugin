@@ -1,5 +1,6 @@
 <?php
 require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
+require_once plugin_dir_path( __FILE__ ) . "/admin/db/equipment.php";
 
 enum EquipmentUnit: String {
     case NONE = "none";
@@ -14,18 +15,6 @@ if ( class_exists( 'BHWorkoutPlugin_Equipment' ) == FALSE ) {
         public ?string $value_max = NULL;
         public ?string $value_step = NULL;
         public ?EquipmentUnit $units = NULL;
-
-        public static function get_all_query(string $table_name) : string {
-            return "SELECT * FROM $table_name ORDER BY Name ASC;";
-        }
-
-        public static function select_query(string $table_name) : string {
-            return "SELECT * FROM $table_name WHERE ID='%s';";
-        }
-
-        public static function delete_query(string $table_name) : string {
-            return "DELETE FROM $table_name WHERE ID='%s'";
-        }
 
         public static function from_db_query($query_result) : BHWorkoutPlugin_Equipment {
             $equipment = new BHWorkoutPlugin_Equipment;
@@ -75,11 +64,11 @@ if ( class_exists( 'BHWorkoutPlugin_Equipment' ) == FALSE ) {
             $sql .= isset($obj['units']) ? "'".$obj['units']."'" : "NULL";
             $sql .= ");";
 
-            error_log($sql);
             return $sql;
         }
 
-        public function db_update(string $table_name) : string {
+        public function db_update() : string {
+            $table_name = BHWorkoutPlugin_EquipmentDB::table_name();
             $obj = $this->to_array();
 
             $sql = "UPDATE $table_name SET ";
