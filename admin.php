@@ -1,7 +1,8 @@
 <?php
-require_once plugin_dir_path( __FILE__ ) . "/database.php";
-require_once plugin_dir_path( __FILE__ ) . "/admin/db/equipment.php";
-require_once plugin_dir_path( __FILE__ ) . "/utils/notices.php";
+require_once plugin_dir_path( __FILE__ ) . "database.php";
+require_once plugin_dir_path( __FILE__ ) . "admin/db/equipment.php";
+require_once plugin_dir_path( __FILE__ ) . "admin/db/warmups.php";
+require_once plugin_dir_path( __FILE__ ) . "utils/notices.php";
 
 if ( class_exists( 'BHWorkoutPlugin_Admin' ) == FALSE ) {
     class BHWorkoutPlugin_Admin {
@@ -140,8 +141,39 @@ if ( class_exists( 'BHWorkoutPlugin_Admin' ) == FALSE ) {
             }
         }
 
+        private static function workouts_admin_parse_warmup() : BHWorkoutPlugin_Warmup {
+            $warmup = new BHWorkoutPlugin_Warmup;
+            $warmup->id = isset($_POST['warmup_id']) ? $_POST['warmup_id'] : NULL;
+            $warmup->name = $_POST['warmup_name'];
+            $warmup->description = isset($_POST['warmup_description']) ? $_POST['warmup_description'] : NULL;
+
+            if (isset($_POST['warmup_equipment'])) {
+                $equipment_uuids = $_POST['warmup_equipment'];
+                foreach($equipment_uuids as $uuid) {
+                    try {
+                        $equipment = BHWorkoutPlugin_EquipmentDB::get_equipment($uuid);
+                        if (is_null($equipment) == FALSE) {
+                            $warmup->equipment[] = $equipment;
+                        }
+                    } catch (Exception $e) {
+                        error_log("[Warmup] Tried to load equipment ($uuid) and failed: $e");
+                    }
+                }
+            }
+
+            return $warmup;
+        }
+
         private static function workouts_admin_add_warmup() {
-            // TBD
+            $warmup = BHWorkoutPlugin_Admin::workouts_admin_parse_warmup();
+
+            try {
+                BHWorkoutPlugin_WarmupsDB::add_warmup($warmup);
+                BHWorkoutPlugin_Notice::success("Added warmup");
+            } catch (Exception $e) {
+                BHWorkoutPlugin_Notice::error($e->getMessage());
+                error_log($e);
+            }
         }
 
         private static function workouts_admin_delete_warmup() {

@@ -9,7 +9,7 @@ require_once plugin_dir_path( __FILE__ ) . "../common.php";
         <p>Something weird went wrong - please try reloading the page.</p>
     </div>
     <div class="notice notice-error equipment-name-error is-dismissible" id='equipment-name-error'>
-        <p>You must include a name for the equipment</p>
+        <p>You must include a name for the equipment.</p>
     </div>
     <h2>Add Equipment</h2>
     <form action="<?php menu_page_url('pages/equipment.php') ?>" method="post" name='add-equipment' id='add-equipment'>
@@ -25,11 +25,13 @@ require_once plugin_dir_path( __FILE__ ) . "../common.php";
                      - 
                     <input type='number' min='0' max='100' step='0.25' name='equipment_value_max' id='equipment_value_max'/>
                      
-                    <?php 
-                        echo BHWorkoutPlugin_Common::htmlSelect(EquipmentUnit::cases(), 
-                                                                'equipment_units', 
-                                                                NULL, 
-                                                                FALSE);
+                    <?php
+                        $units = ["empty" => "-"];
+                        foreach(EquipmentUnit::cases() as $unit) {
+                            $units[$unit->value] = $unit->value;
+                        }
+
+                        echo BHWorkoutPlugin_Common::htmlSelect($units, 'equipment_units', NULL);
                     ?>
 
                     Step: 

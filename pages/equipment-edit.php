@@ -41,10 +41,12 @@ try {
                                 
                                 <?php 
                                     $selected = is_null($equipment->units) ? NULL : $equipment->units->value;
-                                    echo BHWorkoutPlugin_Common::htmlSelect(EquipmentUnit::cases(), 
-                                                                            'equipment_units', 
-                                                                            $selected, 
-                                                                            FALSE);
+                                    $units = ["empty" => "-"];
+                                    foreach(EquipmentUnit::cases() as $unit) {
+                                        $units[$unit->value] = $unit->value;
+                                    }
+
+                                    echo BHWorkoutPlugin_Common::htmlSelect($units, 'equipment_units', $selected);
                                 ?>
 
                                 Step: 

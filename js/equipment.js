@@ -1,17 +1,8 @@
-function equipmentValue(id) {
-    var e = document.getElementById(id);
-    if (e != null) {
-        return e.value;
-    }
-
-    return null;
-}
-
 function equipmentCheckValue() {
-    var min = equipmentValue("equipment_value_min");
-    var max = equipmentValue("equipment_value_max");
-    var step = equipmentValue("equipment_value_step");
-    var unit = equipmentValue("equipment_units");
+    var min = elementValue("equipment_value_min");
+    var max = elementValue("equipment_value_max");
+    var step = elementValue("equipment_value_step");
+    var unit = elementValue("equipment_units");
 
     var null_count = 0;
     if ((min == null) || (min.length == 0)) null_count++;
@@ -25,7 +16,7 @@ function equipmentCheckValue() {
 function addEquipment() {
     hideAllNotices();
 
-    var name = equipmentValue("equipment_name");
+    var name = elementValue("equipment_name");
     if (name != null) {
         if (name.length > 0) {
             if (equipmentCheckValue() == false) {
@@ -76,7 +67,7 @@ function editEquipment(id) {
 function updateEquipment() {
     hideAllNotices();
 
-    var name = equipmentValue("equipment_name");
+    var name = elementValue("equipment_name");
     if (name != null) {
         if (name.length > 0) {
             if (equipmentCheckValue() == false) {
@@ -106,5 +97,4 @@ function cancelEquipmentEdit() {
 function hideAllNotices() {
     hideNotice('equipment-general-error');
     hideNotice('equipment-name-error');
-    hideNotice('equipment-added-success');
 }

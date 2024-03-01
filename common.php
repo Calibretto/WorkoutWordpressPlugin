@@ -1,17 +1,17 @@
 <?php
 if ( class_exists( 'BHWorkoutPlugin_Common' ) == FALSE ) {
     class BHWorkoutPlugin_Common {
-        public static function htmlSelect(array $options, string $id, ?string $selected, bool $required) : string {
-            $html = "<select id='$id' name='$id'>";
-            if ($required == FALSE) {
-                $html .= "<option value='empty'>-</option>";
-            }
+        public static function htmlSelect(array $options, string $id, ?string $selected, bool $multiple = FALSE) : string {
+            if ($multiple) $id .= "[]";
+            $html = "<select id='$id' name='$id'";
+            if ($multiple) $html .= " multiple";
+            $html .= ">";
 
-            foreach($options as $option) {
-                if ($option->value == $selected) {
-                    $html .= "<option value='$option->value' selected>$option->value</option>";
+            foreach($options as $value => $option) {
+                if ($value == $selected) {
+                    $html .= "<option value='$value' selected>$option</option>";
                 } else {
-                    $html .= "<option value='$option->value'>$option->value</option>";
+                    $html .= "<option value='$value'>$option</option>";
                 }
             }
 

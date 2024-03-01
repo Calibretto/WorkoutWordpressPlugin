@@ -114,7 +114,7 @@ if ( class_exists( 'BHWorkoutPlugin_EquipmentDB' ) == FALSE ) {
             $equipment_table_name = self::table_name();
 
             // Equipment stored procedures
-            $sql = "DROP PROCEDURE add_equipment;";
+            $sql = "DROP PROCEDURE IF EXISTS add_equipment;";
             $wpdb->query($sql);
             
             $sql = "CREATE DEFINER=`root`@`localhost` PROCEDURE `add_equipment`(

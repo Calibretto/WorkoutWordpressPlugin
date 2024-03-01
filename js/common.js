@@ -1,3 +1,12 @@
+function elementValue(id) {
+    var e = document.getElementById(id);
+    if (e != null) {
+        return e.value;
+    }
+
+    return null;
+}
+
 function submitForm(id, generalErrorId) {
     var form = document.getElementById(id);
     if (form != null) {
