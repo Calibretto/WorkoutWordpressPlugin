@@ -23,7 +23,7 @@ if ( class_exists( 'BHWorkoutPlugin_EquipmentDB' ) == FALSE ) {
             return "DELETE FROM $table_name WHERE ID='%s'";
         }
 
-        public static function add_equipment(BHWorkoutPlugin_Equipment $equipment) {
+        public static function add(BHWorkoutPlugin_Equipment $equipment) {
             global $wpdb;
 
             $result = $wpdb->query($equipment->db_insert());
@@ -33,7 +33,7 @@ if ( class_exists( 'BHWorkoutPlugin_EquipmentDB' ) == FALSE ) {
             }
         }
 
-        public static function update_equipment(BHWorkoutPlugin_Equipment $equipment) {
+        public static function update(BHWorkoutPlugin_Equipment $equipment) {
             global $wpdb;
 
             $result = $wpdb->query($equipment->db_update());
@@ -43,7 +43,7 @@ if ( class_exists( 'BHWorkoutPlugin_EquipmentDB' ) == FALSE ) {
             }
         }
 
-        public static function delete_equipment(?string $equipment_id) {
+        public static function delete(?string $equipment_id) {
             global $wpdb;
 
             if (is_null($equipment_id)) {
@@ -58,7 +58,7 @@ if ( class_exists( 'BHWorkoutPlugin_EquipmentDB' ) == FALSE ) {
             }
         }
 
-        public static function get_equipment(?string $equipment_id) : ?BHWorkoutPlugin_Equipment {
+        public static function get(?string $equipment_id) : ?BHWorkoutPlugin_Equipment {
             global $wpdb;
 
             if (is_null($equipment_id)) {
@@ -75,7 +75,7 @@ if ( class_exists( 'BHWorkoutPlugin_EquipmentDB' ) == FALSE ) {
             return BHWorkoutPlugin_Equipment::from_db_query($result[0]);
         }
 
-        public static function get_all_equipment() : ?array {
+        public static function get_all() : ?array {
             global $wpdb;
 
             $results = $wpdb->get_results(self::get_all_query());

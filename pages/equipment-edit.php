@@ -5,7 +5,7 @@ require_once plugin_dir_path( __FILE__ ) . "../common.php";
 
 $equipment = NULL;
 try {
-    $equipment = BHWorkoutPlugin_EquipmentDB::get_equipment($_POST['equipment_edit']);
+    $equipment = BHWorkoutPlugin_EquipmentDB::get($_POST['equipment_edit']);
 } catch (Exception $e) {
     BHWorkoutPlugin_Notice::error($e->getMessage());
     error_log($e);

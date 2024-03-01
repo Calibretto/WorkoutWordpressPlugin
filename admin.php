@@ -92,7 +92,7 @@ if ( class_exists( 'BHWorkoutPlugin_Admin' ) == FALSE ) {
             $equipment = BHWorkoutPlugin_Admin::workouts_admin_parse_equipment();
 
             try {
-                BHWorkoutPlugin_EquipmentDB::add_equipment($equipment);
+                BHWorkoutPlugin_EquipmentDB::add($equipment);
                 BHWorkoutPlugin_Notice::success("Added equipment");
             } catch (Exception $e) {
                 BHWorkoutPlugin_Notice::error($e->getMessage());
@@ -102,7 +102,7 @@ if ( class_exists( 'BHWorkoutPlugin_Admin' ) == FALSE ) {
 
         private static function workouts_admin_delete_equipment() {
             try {
-                BHWorkoutPlugin_EquipmentDB::delete_equipment($_POST['equipment_delete']);
+                BHWorkoutPlugin_EquipmentDB::delete($_POST['equipment_delete']);
                 BHWorkoutPlugin_Notice::success("Deleted equipment");
             } catch (Exception $e) {
                 BHWorkoutPlugin_Notice::error($e->getMessage());
@@ -114,7 +114,7 @@ if ( class_exists( 'BHWorkoutPlugin_Admin' ) == FALSE ) {
             $equipment = BHWorkoutPlugin_Admin::workouts_admin_parse_equipment();
 
             try {
-                BHWorkoutPlugin_EquipmentDB::update_equipment($equipment);
+                BHWorkoutPlugin_EquipmentDB::update($equipment);
                 BHWorkoutPlugin_Notice::success("Updated equipment");
             } catch (Exception $e) {
                 BHWorkoutPlugin_Notice::error($e->getMessage());
@@ -151,7 +151,7 @@ if ( class_exists( 'BHWorkoutPlugin_Admin' ) == FALSE ) {
                 $equipment_uuids = $_POST['warmup_equipment'];
                 foreach($equipment_uuids as $uuid) {
                     try {
-                        $equipment = BHWorkoutPlugin_EquipmentDB::get_equipment($uuid);
+                        $equipment = BHWorkoutPlugin_EquipmentDB::get($uuid);
                         if (is_null($equipment) == FALSE) {
                             $warmup->equipment[] = $equipment;
                         }
@@ -168,7 +168,7 @@ if ( class_exists( 'BHWorkoutPlugin_Admin' ) == FALSE ) {
             $warmup = BHWorkoutPlugin_Admin::workouts_admin_parse_warmup();
 
             try {
-                BHWorkoutPlugin_WarmupsDB::add_warmup($warmup);
+                BHWorkoutPlugin_WarmupsDB::add($warmup);
                 BHWorkoutPlugin_Notice::success("Added warmup");
             } catch (Exception $e) {
                 BHWorkoutPlugin_Notice::error($e->getMessage());
@@ -177,7 +177,13 @@ if ( class_exists( 'BHWorkoutPlugin_Admin' ) == FALSE ) {
         }
 
         private static function workouts_admin_delete_warmup() {
-            // TBD
+            try {
+                BHWorkoutPlugin_WarmupsDB::delete($_POST['warmup_delete']);
+                BHWorkoutPlugin_Notice::success("Deleted warmup");
+            } catch (Exception $e) {
+                BHWorkoutPlugin_Notice::error($e->getMessage());
+                error_log($e);
+            }
         }
 
         private static function workouts_admin_update_warmup() {

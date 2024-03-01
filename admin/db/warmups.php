@@ -23,7 +23,11 @@ if ( class_exists( 'BHWorkoutPlugin_WarmupsDB' ) == FALSE ) {
             return "SELECT e.* FROM $equipment_table_name as e INNER JOIN $table_name as w WHERE e.ID = w.EquipmentID AND w.WarmupID = '%s';";
         }
 
-        public static function add_warmup(BHWorkoutPlugin_Warmup $warmup) {
+        public static function delete_query() : string {
+            return "CALL delete_warmup('%s');";
+        }
+
+        public static function add(BHWorkoutPlugin_Warmup $warmup) {
             global $wpdb;
 
             $result = $wpdb->get_results($warmup->db_insert());
@@ -45,7 +49,22 @@ if ( class_exists( 'BHWorkoutPlugin_WarmupsDB' ) == FALSE ) {
             }
         }
 
-        public static function get_all_warmups() : ?array {
+        public static function delete(?string $warmup_id) {
+            global $wpdb;
+
+            if (is_null($warmup_id)) {
+                throw new Exception("Nothing to delete.");
+            }
+
+            $delete_query = self::delete_query();
+            
+            $result = $wpdb->query($wpdb->prepare($delete_query, array($warmup_id)));
+            if ($result === FALSE) {
+                throw new Exception("Unable to delete warmup.");
+            }
+        }
+
+        public static function get_all() : ?array {
             global $wpdb;
 
             $results = $wpdb->get_results(self::get_all_query());
@@ -107,9 +126,10 @@ if ( class_exists( 'BHWorkoutPlugin_WarmupsDB' ) == FALSE ) {
         public static function create_stored_procedures() {
             global $wpdb;
             $warmups_table_name = self::table_name();
+            $warmups_equipment_table_name = self::equipment_table_name();
 
             // Warmup stored procedures
-            $sql = "DROP PROCEDURE IF EXISTS add_warmup;";
+            $sql = "DROP FUNCTION IF EXISTS add_warmup;";
             $wpdb->query($sql);
             
             $sql = "CREATE DEFINER=`root`@`localhost` FUNCTION `add_warmup`(
@@ -121,6 +141,18 @@ if ( class_exists( 'BHWorkoutPlugin_WarmupsDB' ) == FALSE ) {
                     SET _id = UUID();
                     INSERT INTO $warmups_table_name(ID, Name, Description) values (_id, _name, _description);
                     RETURN _id;
+                END;";
+            $wpdb->query($sql);
+
+            $sql = "DROP PROCEDURE IF EXISTS delete_warmup;";
+            $wpdb->query($sql);
+            
+            $sql = "CREATE DEFINER=`root`@`localhost` PROCEDURE `delete_warmup`(
+                `_id` VARCHAR(36) CHARSET utf8
+                ) NOT DETERMINISTIC MODIFIES SQL DATA SQL SECURITY DEFINER 
+                BEGIN 
+                    DELETE FROM $warmups_equipment_table_name WHERE WarmupID = _id;
+                    DELETE FROM $warmups_table_name WHERE ID = _id;
                 END;";
             $wpdb->query($sql);
         }

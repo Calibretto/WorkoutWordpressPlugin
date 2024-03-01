@@ -27,7 +27,7 @@ require_once plugin_dir_path( __FILE__ ) . "../common.php";
                 <td>Equipment:</td>
                 <td>
                     <?php
-                        $equipment = BHWorkoutPlugin_EquipmentDB::get_all_equipment();
+                        $equipment = BHWorkoutPlugin_EquipmentDB::get_all();
                         if(count($equipment) == 0) {
                             echo "<p>No equipment available.</p>";
                         } else {
@@ -60,7 +60,7 @@ require_once plugin_dir_path( __FILE__ ) . "../common.php";
         <input type="hidden" name='warmup_edit' id='warmup_edit' value="warmup_edit"/>
     </form>
     <?php
-        $warmups = BHWorkoutPlugin_WarmupsDB::get_all_warmups();
+        $warmups = BHWorkoutPlugin_WarmupsDB::get_all();
         if(count($warmups) == 0) {
             echo "<p>No warmups available.</p>";
         } else {
