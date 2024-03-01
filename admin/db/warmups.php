@@ -23,6 +23,11 @@ if ( class_exists( 'BHWorkoutPlugin_WarmupsDB' ) == FALSE ) {
             return "SELECT e.* FROM $equipment_table_name as e INNER JOIN $table_name as w WHERE e.ID = w.EquipmentID AND w.WarmupID = '%s';";
         }
 
+        public static function select_query() : string {
+            $table_name = self::table_name();
+            return "SELECT * FROM $table_name WHERE ID='%s';";
+        }
+
         public static function delete_query() : string {
             return "CALL delete_warmup('%s');";
         }
@@ -32,20 +37,15 @@ if ( class_exists( 'BHWorkoutPlugin_WarmupsDB' ) == FALSE ) {
 
             $result = $wpdb->get_results($warmup->db_insert());
             if (isset($result[0]->uuid)) {
-                $uuid = $result[0]->uuid;
-                $equipment_table_name = self::equipment_table_name();
-                foreach($warmup->equipment as $equipment) {
-                    if ($equipment instanceof BHWorkoutPlugin_Equipment) {
-                        $uuids = [$uuid, $equipment->id];
-                        $sql = "INSERT INTO $equipment_table_name(WarmupID, EquipmentID) VALUES('%s', '%s');";
-                        $sql = $wpdb->prepare($sql, $uuids);
-                        $wpdb->query($sql);
-                    }
+                $warmup->id = $result[0]->uuid;
+                $queries = $warmup->db_insert_equipment();
+                foreach($queries as $query) {
+                    $wpdb->query($query);
                 }
             }
 
             if ($result === FALSE) {
-                throw new Exception("Unable to insert equipment.");
+                throw new Exception("Unable to insert warmup.");
             }
         }
 
@@ -61,6 +61,21 @@ if ( class_exists( 'BHWorkoutPlugin_WarmupsDB' ) == FALSE ) {
             $result = $wpdb->query($wpdb->prepare($delete_query, array($warmup_id)));
             if ($result === FALSE) {
                 throw new Exception("Unable to delete warmup.");
+            }
+        }
+
+        public static function update(BHWorkoutPlugin_Warmup $warmup) {
+            global $wpdb;
+
+            $queries = $warmup->db_update();
+            $result = TRUE;
+            foreach($queries as $query) {
+                $result &= $wpdb->query($query);
+            }
+            
+            if ($result === FALSE) {
+                // TODO: Use transactions to undo if it fails.
+                throw new Exception("Unable to update equipment.");
             }
         }
 
@@ -80,6 +95,26 @@ if ( class_exists( 'BHWorkoutPlugin_WarmupsDB' ) == FALSE ) {
                 $warmups[] = $warmup;
             }
             return $warmups;
+        }
+
+        public static function get(?string $warmup_id) : ?BHWorkoutPlugin_Warmup {
+            global $wpdb;
+
+            if (is_null($warmup_id)) {
+                throw new Exception("Nothing to get.");
+            }
+
+            $select_query = self::select_query();
+            
+            $result = $wpdb->get_results($wpdb->prepare($select_query, array($warmup_id)));
+            if (($result === FALSE) || ($result == 0) || (count($result) == 0)) {
+                throw new Exception("Unable to retrieve warmup.");
+            }
+
+            $warmup = BHWorkoutPlugin_Warmup::from_db_query($result[0]);
+            $warmup->equipment = self::get_all_warmup_equipment($warmup);
+
+            return $warmup;
         }
 
         private static function get_all_warmup_equipment(BHWorkoutPlugin_Warmup $warmup) : ?array {

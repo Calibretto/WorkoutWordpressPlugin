@@ -187,7 +187,15 @@ if ( class_exists( 'BHWorkoutPlugin_Admin' ) == FALSE ) {
         }
 
         private static function workouts_admin_update_warmup() {
-            // TBD
+            $warmup = BHWorkoutPlugin_Admin::workouts_admin_parse_warmup();
+
+            try {
+                BHWorkoutPlugin_WarmupsDB::update($warmup);
+                BHWorkoutPlugin_Notice::success("Updated warmup");
+            } catch (Exception $e) {
+                BHWorkoutPlugin_Notice::error($e->getMessage());
+                error_log($e);
+            }
         }
 
         // General

@@ -30,3 +30,11 @@ function hideNotice(id) {
         e.style.display = 'none';
     }
 }
+
+function cancelEdit() {
+    if(confirm("Are you sure you want to cancel?") == false) {
+        return;
+    }
+
+    window.location = document.location.href;
+}

@@ -86,14 +86,6 @@ function updateEquipment() {
     }
 }
 
-function cancelEquipmentEdit() {
-    if(confirm("Are you sure you want to cancel?") == false) {
-        return;
-    }
-
-    window.location = document.location.href;
-}
-
 function hideAllNotices() {
     hideNotice('equipment-general-error');
     hideNotice('equipment-name-error');

@@ -58,7 +58,7 @@ try {
                                 <input type='hidden' name='equipment_id' id='equipment_id' value='<?php echo $equipment->id; ?>'/>
                                 <input type='hidden' name='equipment_save' id='equipment_save' value='equipment_save'/>
                                 <input type='button' value='Save' onclick='updateEquipment();'>
-                                <input type='button' value='Cancel' onclick='cancelEquipmentEdit();'>
+                                <input type='button' value='Cancel' onclick='cancelEdit();'>
                             </td>
                         </tr>
                     </table>

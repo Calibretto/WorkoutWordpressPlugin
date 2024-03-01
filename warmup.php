@@ -52,12 +52,54 @@ if ( class_exists( 'BHWorkoutPlugin_Warmup' ) == FALSE ) {
             return $sql;
         }
 
+        public function db_insert_equipment() : array {
+            global $wpdb;
+            $queries = [];
+
+            $equipment_table_name = BHWorkoutPlugin_WarmupsDB::equipment_table_name();
+            foreach($this->equipment as $equipment) {
+                if ($equipment instanceof BHWorkoutPlugin_Equipment) {
+                    $sql = "INSERT INTO $equipment_table_name(WarmupID, EquipmentID) VALUES('%s', '%s');";
+                    $queries[] = $wpdb->prepare($sql, [$this->id, $equipment->id]);
+                }
+            }
+
+            return $queries;
+        }
+
+        public function db_update() : array {
+            global $wpdb;
+            $table_name = BHWorkoutPlugin_WarmupsDB::table_name();
+            $equipment_table_name = BHWorkoutPlugin_WarmupsDB::equipment_table_name();
+
+            $obj = $this->to_array();
+            $queries = [];
+
+            // Delete equipment first.
+            $queries[] = $wpdb->prepare("DELETE FROM $equipment_table_name WHERE WarmupID = '%s';", [$this->id]);
+
+            // Update warmup.
+            $sql = "UPDATE $table_name SET ";
+            $sql .= "Name='".$obj['name']."', ";
+            $sql .= "Description='".$obj['description']."', ";
+            $sql .= " WHERE ID='".$obj['id']."'";
+
+            // Add equipment.
+            $queries = array_merge($queries, $this->db_insert_equipment());
+
+            return $queries;
+        }
+
         public function equipment_display_list() : string {
             if(count($this->equipment) == 0) {
                 return "-";
             }
 
             return implode(", ", array_column($this->equipment, 'name'));
+        }
+
+        public function equipment_ids() : array {
+            return array_column($this->equipment, 'id');
         }
     }
 }
